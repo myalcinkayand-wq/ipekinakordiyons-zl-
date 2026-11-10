@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Benim Akordiyon Sözlüğüm – Müzik Sahneleri</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap">
+<style>
+:root{color-scheme:light dark;--plate:#534AB7;--plate2:#3C3489;--key:#F1EFE8;--ink:#2C2C2A;--accent:#FAC775;--paper:#FFF9E8;--soft:#D9D5F5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--plate:#2C2C2A;--plate2:#1F1F1E;--soft:#B4B2A9}}
+:root[data-theme="dark"]{--plate:#2C2C2A;--plate2:#1F1F1E;--soft:#B4B2A9}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--plate);color:var(--key);font-family:"Fredoka","Trebuchet MS","Segoe UI",system-ui,sans-serif;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 28px}
+h1{margin:0 0 4px;font-size:1.7rem;font-weight:600;color:var(--accent);line-height:1.15}
+.lead{margin:0 0 16px;color:var(--soft)}
+.stage{background:var(--paper);color:var(--ink);border-radius:16px;overflow:hidden;border:3px solid var(--plate2)}
+.art svg{display:block;width:100%;height:auto}
+.art svg.in{animation:fade .35s ease}
+@keyframes fade{from{opacity:.2}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.art svg.in{animation:none}}
+.art text{font-family:inherit}
+.txt{padding:14px 16px 18px}
+.txt h2{margin:0;font-size:2rem;font-weight:600;line-height:1.1}
+.mean{margin:4px 0 12px;color:#5F5E5A}
+.sent{margin:0;font-size:1.2rem;font-weight:600;line-height:1.35}
+.tag{display:inline-block;margin-top:10px;padding:2px 10px;border-radius:99px;background:var(--accent);color:#412402;font-size:.85rem}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:16px}
+.keys button{font:inherit;font-size:.95rem;color:var(--ink);background:var(--key);border:0;border-bottom:6px solid var(--c);border-radius:6px 6px 12px 12px;padding:14px 2px 10px;cursor:pointer}
+.keys button[aria-pressed="true"]{background:var(--accent)}
+.keys button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.play{font:inherit;margin:10px 0 0 8px;padding:3px 14px;border:0;border-radius:99px;background:var(--plate);color:#fff;cursor:pointer}.play:focus-visible{outline:3px solid var(--accent);outline-offset:2px}footer{margin-top:18px;font-size:.8rem;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Benim Akordiyon Sözlüğüm</h1>
+<p class="lead">Bir kelimeye dokun, o kelimenin yaşandığı sahneyi gör.</p>
+<article class="stage" aria-live="polite">
+<div class="art" id="art"></div>
+<div class="txt"><h2 id="w"></h2><p class="mean" id="n"></p><p class="sent" id="s"></p><span class="tag" id="k"></span><button type="button" class="play" id="pl">▶ Sesi dinle</button></div>
+</article>
+<nav class="keys" id="keys" aria-label="Kelimeler"></nav>
+<footer>Sözlükteki resimler öğrenciye aittir. Bu sayfadaki sahneler, kelimelerin geçtiği yaşantıyı göstermek için yetişkin yardımıyla dijital olarak hazırlanmıştır. Anlamlar kısa açıklamalardır.</footer>
+</div>
+<script>
+const SK='stroke="#3a2a1a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"';
+const bg=(a,b,y=150)=>`<rect width="320" height="200" fill="${a}"/><rect y="${y}" width="320" height="60" fill="${b}"/>`;
+const per=(x,y,c,h='#4A2F1A')=>`<path d="M${x-13} ${y+48}L${x-9} ${y+12}L${x+9} ${y+12}L${x+13} ${y+48}Z" fill="${c}" ${SK}/><circle cx="${x}" cy="${y}" r="11" fill="#F5C9A0" ${SK}/><path d="M${x-11} ${y-3}Q${x} ${y-20} ${x+11} ${y-3}Q${x} ${y-9} ${x-11} ${y-3}Z" fill="${h}"/><circle cx="${x-4}" cy="${y+1}" r="1.6" fill="#2C2C2A"/><circle cx="${x+4}" cy="${y+1}" r="1.6" fill="#2C2C2A"/><path d="M${x-4} ${y+6}Q${x} ${y+9} ${x+4} ${y+6}" fill="none" stroke="#7A3A2A" stroke-width="1.5"/>`;
+const note=(x,y,c='#FAC775')=>`<circle cx="${x}" cy="${y}" r="4.5" fill="${c}"/><path d="M${x+4.5} ${y}V${y-17}L${x+12} ${y-13}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round"/>`;
+const sheep=(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="14" ry="10" fill="#fff" stroke="#B4B2A9" stroke-width="2"/><circle cx="${x+13}" cy="${y-3}" r="5" fill="#444"/><path d="M${x-6} ${y+9}v7M${x+6} ${y+9}v7" stroke="#444" stroke-width="2"/>`;
+const sun=(x,y)=>`<circle cx="${x}" cy="${y}" r="14" fill="#FFD84D" stroke="#C79A00" stroke-width="2"/>`;
+const mouth=(x,y)=>`<ellipse cx="${x}" cy="${y+7}" rx="3" ry="3.5" fill="#C0392B"/>`;
+const arm=(a,b,c,d)=>`<path d="M${a} ${b}L${c} ${d}" stroke="#E8B88A" stroke-width="4" stroke-linecap="round"/>`;
+const drum=x=>`<rect x="${x-18}" y="124" width="36" height="24" fill="#F0A030" stroke="#8A5A10" stroke-width="2"/><ellipse cx="${x}" cy="124" rx="18" ry="5" fill="#F5E6C8" stroke="#8A5A10" stroke-width="2"/>`;
+const win=(x,y)=>`<rect x="${x}" y="${y}" width="60" height="52" fill="#BEE3F8" stroke="#8B5A2B" stroke-width="4"/><path d="M${x+30} ${y}v52M${x} ${y+26}h60" stroke="#8B5A2B" stroke-width="3"/>`;
+const stars='<circle cx="40" cy="30" r="2" fill="#fff"/><circle cx="110" cy="44" r="2" fill="#fff"/><circle cx="200" cy="24" r="2" fill="#fff"/>';
+const peaks='<polygon points="0,145 70,60 140,145" fill="#6C8EAD"/><polygon points="90,145 170,50 250,145" fill="#8AA6BF"/><polygon points="200,145 280,70 320,145" fill="#6C8EAD"/>';
+const crowd=(xs,cols,y)=>xs.map((x,i)=>per(x,y,cols[i%cols.length],i%2?'#2C2C2A':'#6B3A1A')+mouth(x,y)).join('');
+
+const D=[
+{w:'Saz',n:'telli, saplı bir çalgı (bağlama).',s:'Dedem akşamları sazını alıp türkü çalar.',k:'Bağlam cümlesi',
+ a:bg('#3B3A6B','#8B5A2B',140)+'<circle cx="262" cy="40" r="16" fill="#FFD84D"/>'+stars+per(110,92,'#8FB339','#E8E8E8')+`<ellipse cx="152" cy="126" rx="24" ry="20" fill="#C98B4A" ${SK}/><path d="M152 124L214 90" stroke="#8B5A2B" stroke-width="7" stroke-linecap="round"/><circle cx="152" cy="128" r="6" fill="#3B2A1A"/>`+note(232,62)+note(262,100,'#F4C0D1')},
+{w:'Kaval',n:'kamıştan ya da ağaçtan yapılan üflemeli çalgı.',s:'Çoban kavalını çalınca koyunlar toplandı.',k:'Bağlam cümlesi',
+ a:bg('#BFE3F5','#6FBF5A',140)+'<ellipse cx="250" cy="146" rx="120" ry="36" fill="#5CAF4A"/>'+sun(44,38)+per(100,92,'#C0612A')+'<path d="M110 102L168 84" stroke="#E3B26B" stroke-width="6" stroke-linecap="round"/>'+note(184,70)+sheep(210,150)+sheep(262,162)+sheep(160,170)},
+{w:'Davul',n:'derisi gerilmiş, sopayla çalınan çalgı.',s:'Davulun sesi uzaktan hoş gelir.',k:'Atasözü',
+ a:bg('#FDE7B0','#9AD06B')+'<ellipse cx="250" cy="150" rx="90" ry="28" fill="#7CBF58"/><circle cx="258" cy="112" r="5" fill="#F5C9A0"/><rect x="253" y="118" width="10" height="14" fill="#5B8DEF"/><rect x="248" y="126" width="20" height="10" fill="#E24B4A" stroke="#8A1C12"/><path d="M130 76Q142 100 130 124M152 64Q170 100 152 136M174 52Q198 100 174 148" fill="none" stroke="#E24B4A" stroke-width="3" stroke-linecap="round" opacity=".7"/>'+per(70,92,'#5B8DEF')+arm(80,112,86,92)},
+{w:'Zurna',n:'düğünlerde davulla çalınan üflemeli çalgı.',s:'Düğünde zurna çalınca herkes halaya durdu.',k:'Bağlam cümlesi',
+ a:bg('#FFD7A8','#C98B4A',145)+'<path d="M0 22Q160 62 320 22" fill="none" stroke="#444" stroke-width="2"/><path d="M40 34l8 18 8-18zM160 48l8 18 8-18zM280 34l8 18 8-18z" fill="#E24B4A"/><path d="M100 44l8 18 8-18z" fill="#FAC775"/><path d="M220 44l8 18 8-18z" fill="#5B8DEF"/>'+per(80,95,'#E24B4A')+`<path d="M90 104L122 94L134 82L134 114L122 102Z" fill="#D9A441" ${SK}/>`+per(190,95,'#5CB85C')+arm(177,112,166,88)+arm(203,112,214,88)+per(250,95,'#B5651D')+arm(237,112,226,88)+arm(263,112,274,88)+note(150,70)},
+{w:'Ney',n:'kamıştan yapılan, yumuşak sesli üflemeli çalgı.',s:'Neyin sesi insana huzur verir.',k:'Bağlam cümlesi',
+ a:bg('#2E3A6B','#4C7A4A',140)+'<rect y="168" width="320" height="32" fill="#22305F"/><rect x="34" y="76" width="10" height="64" fill="#5A3A1A"/><circle cx="39" cy="62" r="30" fill="#2E7D4F"/><circle cx="256" cy="42" r="18" fill="#FFF2B0"/><ellipse cx="256" cy="184" rx="16" ry="4" fill="#FFF2B0" opacity=".6"/>'+per(110,92,'#C0612A')+'<path d="M118 104L182 80" stroke="#C9A66B" stroke-width="5" stroke-linecap="round"/>'+note(200,64,'#B5D4F4')+note(226,88,'#B5D4F4')},
+{w:'Def',n:'yuvarlak çerçeveli, derili, elle çalınan çalgı.',s:'Bayramda halam def çaldı, hepimiz söyledik.',k:'Bağlam cümlesi',
+ a:bg('#FFE3EC','#E8A87C')+'<path d="M0 18Q160 52 320 18" fill="none" stroke="#444" stroke-width="2"/><path d="M50 30l8 16 8-16zM130 40l8 16 8-16zM210 40l8 16 8-16z" fill="#F4A6B8"/><path d="M280 70A12 12 0 1 0 292 86A9 9 0 1 1 280 70Z" fill="#FFD84D"/>'+per(85,98,'#5B8DEF')+mouth(85,98)+per(235,98,'#5CB85C')+mouth(235,98)+per(160,92,'#D4537E')+'<circle cx="182" cy="116" r="19" fill="#F5E6C8" stroke="#A9742E" stroke-width="5"/><circle cx="182" cy="97" r="3" fill="#FFD84D"/><circle cx="182" cy="135" r="3" fill="#FFD84D"/><circle cx="163" cy="116" r="3" fill="#FFD84D"/><circle cx="201" cy="116" r="3" fill="#FFD84D"/>'+note(120,70)+note(205,66,'#E24B4A')},
+{w:'Kemençe',n:'küçük, yaylı bir çalgı.',s:'Horon, kemençe sesiyle oynanır.',k:'Bağlam cümlesi',
+ a:bg('#BEE3F8','#4C9A5A',145)+peaks+per(100,95,'#8B3A3A')+`<ellipse cx="124" cy="120" rx="8" ry="10" fill="#B85C38" ${SK}/><path d="M124 112L134 84" stroke="#8B5A2B" stroke-width="4"/><path d="M104 132Q130 100 150 108" fill="none" stroke="#5A3A1A" stroke-width="2.5"/>`+per(210,98,'#E8B030')+per(260,98,'#4C7FD1')+'<path d="M222 120L248 120" stroke="#E8B88A" stroke-width="4"/>'+note(150,60)},
+{w:'Bendir',n:'büyük ve kalın çerçeveli def.',s:'Bendirin sesi derinden ve güçlü gelir.',k:'Bağlam cümlesi',
+ a:bg('#FFE8C2','#C98B4A')+per(100,92,'#7B5BD1')+`<circle cx="200" cy="108" r="30" fill="#F5E6C8" stroke="#A9742E" stroke-width="7"/><path d="M174 104Q200 110 226 104M174 114Q200 120 226 114" fill="none" stroke="#444" stroke-width="1.5"/><circle cx="200" cy="108" r="44" fill="none" stroke="#E24B4A" stroke-width="2" opacity=".5"/><circle cx="200" cy="108" r="56" fill="none" stroke="#E24B4A" stroke-width="2" opacity=".3"/><path d="M112 112L165 106" stroke="#E8B88A" stroke-width="5" stroke-linecap="round"/><circle cx="168" cy="106" r="6" fill="#F5C9A0" ${SK}/>`},
+{w:'Çalgı',n:'müzik aleti.',s:'Davul bile dengi dengine çalar.',k:'Atasözü',
+ a:bg('#E9F3FF','#9AD06B')+per(80,92,'#E24B4A')+drum(80)+per(240,92,'#5B8DEF')+drum(240)+'<text x="160" y="112" text-anchor="middle" font-size="44" font-weight="600" fill="#E24B4A">=</text>'+note(136,60)+note(190,56,'#5B8DEF')},
+{w:'Türkü',n:'halkın söylediği ezgili şiir.',s:'Anneannem türkü söylerken mutlu olur.',k:'Bağlam cümlesi',
+ a:bg('#FFF1D6','#C98B4A')+win(232,26)+'<path d="M240 92h24l-3 18h-18z" fill="#C0612A"/><circle cx="252" cy="86" r="7" fill="#E24B4A"/>'+per(130,92,'#9B59B6','#E8E8E8')+'<circle cx="130" cy="76" r="7" fill="#E8E8E8"/><circle cx="125" cy="93" r="4.5" fill="none" stroke="#444" stroke-width="1.5"/><circle cx="135" cy="93" r="4.5" fill="none" stroke="#444" stroke-width="1.5"/>'+mouth(130,92)+note(80,70,'#E24B4A')+note(180,60,'#5B8DEF')+note(60,112,'#5CB85C')},
+{w:'Ninni',n:'bebeği uyutmak için söylenen ezgi.',s:'Annem ninni söyleyerek bebeği uyuttu.',k:'Bağlam cümlesi',
+ a:bg('#1F2A5A','#6B4A2F')+'<path d="M262 30A20 20 0 1 0 280 62A15 15 0 1 1 262 30Z" fill="#FFD84D"/>'+stars+per(80,92,'#E24B4A')+`<circle cx="180" cy="122" r="9" fill="#F5C9A0" ${SK}/><path d="M175 121q2 2 4 0M181 121q2 2 4 0" fill="none" stroke="#444" stroke-width="1.5"/><path d="M135 128Q180 175 225 128Z" fill="#E8A87C" ${SK}/><path d="M150 132Q180 142 210 132L206 128Q180 136 154 128Z" fill="#F4A6B8"/><text x="236" y="106" font-size="22" fill="#B5D4F4">z</text><text x="252" y="86" font-size="16" fill="#B5D4F4">z</text>`+note(122,66)},
+{w:'Mani',n:'dört dizeli halk şiiri.',s:'Okulda mani yarışması yaptık.',k:'Bağlam cümlesi',
+ a:bg('#E3F0E3','#C9A66B')+'<rect x="60" y="18" width="200" height="62" fill="#2F6B4F" stroke="#8B5A2B" stroke-width="4"/><text x="160" y="60" text-anchor="middle" font-size="30" font-weight="600" fill="#fff">MANİ</text>'+per(90,98,'#F0A030')+'<rect x="102" y="116" width="20" height="14" fill="#fff" stroke="#888" stroke-width="1.5"/>'+[185,225,265].map((x,i)=>`<rect x="${x-10}" y="130" width="20" height="10" fill="${['#5B8DEF','#E24B4A','#5CB85C'][i]}"/><circle cx="${x}" cy="122" r="9" fill="#F5C9A0" ${SK}/><rect x="${x-17}" y="138" width="34" height="10" fill="#8B5A2B"/>`).join('')},
+{w:'Ezgi',n:'kulağa hoş gelen sesler dizisi.',s:'Sabah kuşların ezgisiyle uyandım.',k:'Bağlam cümlesi',
+ a:bg('#FFF0D0','#C9A66B',165)+'<rect x="196" y="26" width="92" height="72" fill="#FFD7A8" stroke="#8B5A2B" stroke-width="4"/><path d="M226 98A16 16 0 0 1 258 98Z" fill="#F08A30"/><path d="M196 62L262 52" stroke="#5A3A1A" stroke-width="3"/><ellipse cx="236" cy="48" rx="10" ry="7" fill="#FFD84D" stroke="#C79A00" stroke-width="1.5"/><circle cx="247" cy="44" r="5" fill="#FFD84D" stroke="#C79A00" stroke-width="1.5"/><polygon points="251,43 257,45 251,47" fill="#F0A030"/>'+note(270,40,'#E24B4A')+note(206,40,'#5B8DEF')+`<rect x="16" y="112" width="150" height="48" rx="6" fill="#5B8DEF" ${SK}/><rect x="22" y="100" width="36" height="16" rx="6" fill="#fff" stroke="#888" stroke-width="2"/><circle cx="46" cy="102" r="11" fill="#F5C9A0" ${SK}/><path d="M35 99Q46 82 57 99Q46 93 35 99Z" fill="#4A2F1A"/><circle cx="42" cy="103" r="1.6" fill="#2C2C2A"/><circle cx="50" cy="103" r="1.6" fill="#2C2C2A"/><path d="M42 108Q46 111 50 108" fill="none" stroke="#7A3A2A" stroke-width="1.5"/><rect x="62" y="118" width="100" height="36" fill="#E24B4A" ${SK}/>`},
+{w:'Nağme',n:'tatlı ve hoş ezgi.',s:'Radyodan hoş bir nağme duyuldu.',k:'Bağlam cümlesi',
+ a:bg('#F5E8D0','#A9742E',132)+`<rect x="105" y="78" width="112" height="54" rx="8" fill="#B5651D" ${SK}/><circle cx="142" cy="106" r="19" fill="#8B4A12" stroke="#5A3A1A" stroke-width="2"/><circle cx="136" cy="100" r="2" fill="#5A3A1A"/><circle cx="148" cy="100" r="2" fill="#5A3A1A"/><circle cx="136" cy="112" r="2" fill="#5A3A1A"/><circle cx="148" cy="112" r="2" fill="#5A3A1A"/><circle cx="190" cy="98" r="8" fill="#F5E6C8" stroke="#5A3A1A" stroke-width="2"/><path d="M205 78L240 34" stroke="#444" stroke-width="2.5" stroke-linecap="round"/><rect x="252" y="112" width="15" height="20" fill="#C0392B" opacity=".85"/><ellipse cx="259" cy="133" rx="14" ry="3" fill="#F5E6C8" stroke="#888" stroke-width="1.5"/>`+note(60,70,'#E24B4A')+note(80,46,'#5B8DEF')+note(36,100,'#5CB85C')},
+{w:'Koro',n:'birlikte şarkı söyleyen topluluk.',s:'Okul korosu hep bir ağızdan şarkı söyledi.',k:'Deyim: hep bir ağızdan',
+ a:bg('#7A1F2B','#8B5A2B')+'<rect width="56" height="150" fill="#A32D2D"/><rect x="264" width="56" height="150" fill="#A32D2D"/><path d="M14 0V150M28 0V150M42 0V150M278 0V150M292 0V150M306 0V150" stroke="#791F1F" stroke-width="3"/>'+crowd([88,124,160,196,232],['#5B8DEF','#F0A030','#5CB85C','#F4A6B8','#B07CF0'],98)+note(120,52)+note(190,40,'#F4C0D1')+note(250,60,'#B5D4F4')},
+{w:'Ses',n:'kulakla duyduğumuz şey.',s:'Her kafadan bir ses çıkıyor.',k:'Deyim: her kafadan bir ses çıkmak',
+ a:bg('#E9E4FF','#B9B0E8')+[[50,'#5B8DEF','?'],[125,'#E24B4A','!'],[200,'#5CB85C','♪'],[275,'#F0A030','…']].map(p=>per(p[0],100,p[1])+`<ellipse cx="${p[0]}" cy="38" rx="24" ry="17" fill="#fff" stroke="#888" stroke-width="2"/><path d="M${p[0]-6} 53L${p[0]} 70L${p[0]+6} 53Z" fill="#fff" stroke="#888" stroke-width="2"/><text x="${p[0]}" y="46" text-anchor="middle" font-size="22" font-weight="600" fill="${p[1]}">${p[2]}</text>`).join('')}
+];
+let AC,M,au,cur=0;const FILES={};
+function ctx(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
+function out(a){const g=a.createGain(),c=a.createDynamicsCompressor();g.gain.value=.9;g.connect(c);c.connect(a.destination);M=g;return g}
+function stopAll(){try{if(M){M.gain.cancelScheduledValues(0);M.gain.value=0;M.disconnect()}}catch(e){}M=null;if(au){au.pause();au=null}if('speechSynthesis' in window)speechSynthesis.cancel()}
+const F=n=>440*Math.pow(2,(n-69)/12);
+function env(g,t,v,at,dur,rl){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+at);g.gain.setValueAtTime(v,t+Math.max(at,dur-rl));g.gain.linearRampToValueAtTime(0,t+dur)}
+function osc(a,ty,f,t,dur,det){const o=a.createOscillator();o.type=ty;o.frequency.value=f;if(det)o.detune.value=det;o.start(t);o.stop(t+dur+.05);return o}
+function vib(a,o,f,rate,depth,t,dur){const l=osc(a,'sine',rate,t,dur),g=a.createGain();g.gain.value=depth*f;l.connect(g);g.connect(o.frequency)}
+function noise(a,d,t,dur,v,fc,q){const n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;f.type='bandpass';f.frequency.value=fc;f.Q.value=q;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);g.connect(d);s.start(t)}
+function pluck(a,d,t,f,dur,v){[0,4].forEach(c=>{const o=osc(a,'sawtooth',f,t,dur,c),g=a.createGain(),l=a.createBiquadFilter();l.type='lowpass';l.frequency.setValueAtTime(3500,t);l.frequency.exponentialRampToValueAtTime(600,t+dur);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v/2,t+.005);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(l);l.connect(g);g.connect(d)})}
+function flute(a,d,t,f,dur,v,br){const o=osc(a,'triangle',f,t,dur),g=a.createGain();vib(a,o,f,5,.006,t,dur);env(g,t,v,.08,dur,.1);o.connect(g);g.connect(d);noise(a,d,t,Math.min(dur,.6),br,f*2,1.5)}
+function zurna(a,d,t,f,dur,v){const o=osc(a,'sawtooth',f,t,dur),o2=osc(a,'square',f*1.004,t,dur),g=a.createGain(),b=a.createBiquadFilter(),l=a.createBiquadFilter();b.type='bandpass';b.frequency.value=1500;b.Q.value=2.5;l.type='lowpass';l.frequency.value=3200;env(g,t,v,.03,dur,.05);o.connect(b);o2.connect(b);b.connect(l);l.connect(g);g.connect(d)}
+function bow(a,d,t,f,dur,v){const o=osc(a,'sawtooth',f,t,dur),g=a.createGain(),l=a.createBiquadFilter();vib(a,o,f,6,.008,t,dur);l.type='lowpass';l.frequency.value=2400;l.Q.value=3;env(g,t,v,.05,dur,.06);o.connect(l);l.connect(g);g.connect(d);noise(a,d,t,Math.min(dur,.25),.03,3000,1)}
+function kick(a,d,t,f=110,dur=.35,v=.9){const o=osc(a,'sine',f,t,dur),g=a.createGain();o.frequency.setValueAtTime(f*1.6,t);o.frequency.exponentialRampToValueAtTime(f*.5,t+dur);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(d)}
+function tak(a,d,t,v=.4){noise(a,d,t,.08,v,3500,.8)}
+function def(a,d,t){kick(a,d,t,180,.2,.5);noise(a,d,t,.14,.25,8000,2)}
+function bendir(a,d,t){kick(a,d,t,85,.45,.85)}
+function baa(a,d,t,f,dur,v){const o=osc(a,'sawtooth',f,t,dur),g=a.createGain(),b=a.createBiquadFilter(),l=osc(a,'sine',22,t,dur),lg=a.createGain();o.frequency.setValueAtTime(f,t);o.frequency.linearRampToValueAtTime(f*.85,t+dur);lg.gain.value=18;l.connect(lg);lg.connect(o.frequency);b.type='bandpass';b.frequency.setValueAtTime(900,t);b.frequency.linearRampToValueAtTime(1300,t+dur*.5);b.Q.value=4;env(g,t,v,.05,dur,dur*.3);o.connect(b);b.connect(g);g.connect(d)}
+function bell(a,d,t,f,dur,v){[1,2.01,3.97].forEach((m,i)=>{const o=osc(a,'sine',f*m,t,dur),g=a.createGain();g.gain.setValueAtTime(v/(i+1),t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(d)})}
+function choir(a,d,t,fs,dur,v){fs.forEach(f=>[0,7,-7].forEach(c=>{const o=osc(a,'sawtooth',f,t,dur,c),g=a.createGain(),b1=a.createBiquadFilter(),b2=a.createBiquadFilter();b1.type='bandpass';b1.frequency.value=750;b1.Q.value=5;b2.type='bandpass';b2.frequency.value=1150;b2.Q.value=6;env(g,t,v/3,.3,dur,.4);o.connect(b1);o.connect(b2);b1.connect(g);b2.connect(g);g.connect(d)}))}
+function say(txt,rate){if(!('speechSynthesis' in window))return false;const u=new SpeechSynthesisUtterance(txt);u.lang='tr-TR';u.rate=rate||.85;u.pitch=1.1;speechSynthesis.speak(u);return true}
+function synth(i){const a=ctx(),d=out(a),t=a.currentTime+.05;
+switch(i){
+case 0:[[57,0,.5],[60,.5,.5],[62,1,.5],[64,1.5,1],[62,2.5,.5],[60,3,.5],[59,3.5,.5],[57,4,1.4]].forEach(n=>{const c=Math.round(n[2]/.12);for(let k=0;k<c;k++)pluck(a,d,t+n[1]+k*.12,F(n[0]),.5,.3)});[0,2,4].forEach(x=>pluck(a,d,t+x,F(45),1.5,.35));break;
+case 1:baa(a,d,t,330,.7,.3);baa(a,d,t+.9,300,.6,.3);[[69,1.8,.5],[72,2.3,.5],[71,2.8,.5],[69,3.3,.5],[67,3.8,.9],[69,4.7,.7],[64,5.4,1.4]].forEach(n=>flute(a,d,t+n[1],F(n[0]),n[2],.3,.07));break;
+case 2:for(let r=0;r<3;r++){const b=t+r*2;[0,1,1.25].forEach(x=>kick(a,d,b+x));[.5,.75,1.5].forEach(x=>tak(a,d,b+x))}break;
+case 3:[[69,0,.4],[71,.4,.2],[69,.6,.2],[67,.8,.5],[69,1.3,.4],[71,1.7,.4],[72,2.1,.9],[71,3,.3],[69,3.3,.3],[67,3.6,1]].forEach(n=>zurna(a,d,t+n[1],F(n[0]),n[2],.22));[0,1,1.5,2,3,3.5].forEach(x=>kick(a,d,t+x,110,.3,.6));break;
+case 4:[[62,0,1.2],[65,1.2,1],[64,2.2,.8],[62,3,1],[60,4,1.8]].forEach(n=>flute(a,d,t+n[1],F(n[0]),n[2],.28,.1));break;
+case 5:for(let r=0;r<3;r++)[0,.5,.75,1,1.5,1.75].forEach(x=>def(a,d,t+r*2+x));break;
+case 6:[[76,0,.2],[74,.2,.2],[72,.4,.2],[74,.6,.2],[76,.8,.4],[79,1.2,.4],[76,1.6,.2],[74,1.8,.2],[72,2,.2],[74,2.2,.2],[76,2.4,.8],[72,3.3,.3],[74,3.6,.3],[76,3.9,1]].forEach(n=>bow(a,d,t+n[1],F(n[0]),n[2],.22));break;
+case 7:[0,.8,1.2,1.6,2.4,3.2,3.6,4,4.8].forEach(x=>bendir(a,d,t+x));[.4,2,2.8].forEach(x=>tak(a,d,t+x,.3));break;
+case 8:[57,60,64,60,57,60,64,60].forEach((n,k)=>pluck(a,d,t+k*.5,F(n),.6,.3));[[69,0,1],[72,1,1],[69,2,2]].forEach(n=>flute(a,d,t+n[1],F(n[0]),n[2],.25,.06));[0,1,2,3].forEach(x=>kick(a,d,t+x,110,.3,.5));[.5,1.5,2.5,3.5].forEach(x=>tak(a,d,t+x,.25));break;
+case 9:[[62,0,.5],[63,.5,.5],[66,1,.5],[67,1.5,.5],[66,2,.5],[63,2.5,.5],[62,3,1.2],[69,4.3,.5],[67,4.8,.5],[66,5.3,.5],[63,5.8,.5],[62,6.3,1.4]].forEach(n=>{const c=Math.round(n[2]/.12);for(let k=0;k<c;k++)pluck(a,d,t+n[1]+k*.12,F(n[0]),.5,.3)});break;
+case 10:[[67,0],[64,.6],[67,1.2],[69,1.8],[67,2.4],[64,3],[65,3.6],[62,4.2],[65,4.8],[67,5.4],[64,6]].forEach(n=>bell(a,d,t+n[1],F(n[0]),1.4,.22));break;
+case 11:if(!say('Gökte yıldız parlıyor. Gönlüm sana varıyor. Şu güzel Türkçemizle. Mani olup çağlıyor.',.8))[60,62,64,65].forEach((n,k)=>bell(a,d,t+k*.6,F(n),1.4,.3));break;
+case 12:[[60,0],[62,.7],[64,1.4],[65,2.1]].forEach(n=>bell(a,d,t+n[1],F(n[0]),1.4,.35));break;
+case 13:[[72,0],[76,.35],[79,.7],[84,1.05],[79,1.6],[76,1.95],[72,2.3]].forEach(n=>bell(a,d,t+n[1],F(n[0]),1.4,.3));break;
+case 14:choir(a,d,t,[F(48),F(52),F(55),F(60)],2.8,.25);choir(a,d,t+2.8,[F(53),F(57),F(60),F(65)],2.8,.25);break;
+case 15:if(!say('Ses. Bir, iki, deneme.',.9))[880,880].forEach((f,k)=>bell(a,d,t+k*.5,f,.4,.3));break}}
+function play(i){cur=i;stopAll();ctx();if(FILES[i]){au=new Audio(FILES[i]);au.play().catch(()=>synth(i));return}synth(i)}
+document.getElementById('pl').onclick=()=>play(cur);
+const cs=['#E24B4A','#F0A030','#FFD84D','#5CB85C','#5B8DEF','#B07CF0','#F4A6B8','#2BB5A5'];
+const art=document.getElementById('art'),keys=document.getElementById('keys');
+function show(i){
+ const d=D[i];
+ art.innerHTML='<svg class="in" viewBox="0 0 320 200" role="img" aria-label="'+d.w+': '+d.s+'">'+d.a+'</svg>';
+ document.getElementById('w').textContent=d.w;
+ document.getElementById('n').textContent=d.n;
+ document.getElementById('s').textContent='“'+d.s+'”';
+ document.getElementById('k').textContent=d.k;
+ [...keys.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+}
+D.forEach((d,i)=>{const b=document.createElement('button');b.type='button';b.textContent=d.w;b.style.setProperty('--c',cs[i%8]);b.onclick=()=>{show(i);play(i)};keys.appendChild(b);});
+show(0);
+</script>
+</body>
+</html>
